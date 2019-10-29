@@ -23,35 +23,36 @@ all: tools linux libc_only libs_only user_only romfs image
 # Get the core stuff worked out
 #
 
-ROOTDIR        = $(shell pwd)
-HOSTCC         = gcc
-ROMFSINST      = $(ROOTDIR)/tools/romfs-inst.sh
-TFTPDIR        = /tftpboot
-PATH          := $(PATH):$(ROOTDIR)/tools
+ROOTDIR        	 = $(shell pwd)
+HOSTCC         	 = gcc
+ROMFSINST      	 = $(ROOTDIR)/tools/romfs-inst.sh
+TFTPDIR        	 = /tftpboot
+PATH          	 := $(PATH):$(ROOTDIR)/tools
 
-VERSIONSTR     = Mediatek/$(CONFIG_PRODUCT) Version $(VERSIONPKG)
+VERSIONSTR     	 = Mediatek/$(CONFIG_PRODUCT) Version $(VERSIONPKG)
 
-BOARDDIR	= $(ROOTDIR)/configs/boards/$(CONFIG_VENDOR)/$(CONFIG_FIRMWARE_PRODUCT_ID)
-LINUXDIR       = linux-3.4.x
-LINUXINCDIR    = $(ROOTDIR)/$(LINUXDIR)/include
-IMAGEDIR       = $(ROOTDIR)/images
-ROMFSDIR       = $(ROOTDIR)/romfs
-STAGEDIR       = $(ROOTDIR)/stage
-SCRIPTSDIR     = $(ROOTDIR)/config/scripts
-LINUX_CONFIG   = $(ROOTDIR)/$(LINUXDIR)/.config
-ARCH_CONFIG    = $(ROOTDIR)/vendors/config/mips/config.arch
-PROJECT_CONFIG = $(ROOTDIR)/.config
-SSTRIP_TOOL    = $(if $(CONFIG_FIRMWARE_PERFORM_SSTRIP),$(ROOTDIR)/tools/sstrip/sstrip)
+BOARDDIR		 = $(ROOTDIR)/configs/boards/$(CONFIG_VENDOR)/$(CONFIG_FIRMWARE_PRODUCT_ID)
+LINUXDIR       	 = linux-3.4.x
+LINUXINCDIR    	 = $(ROOTDIR)/$(LINUXDIR)/include
+IMAGEDIR       	 = $(ROOTDIR)/images
+ROMFSDIR       	 = $(ROOTDIR)/romfs
+STAGEDIR       	 = $(ROOTDIR)/stage
+SCRIPTSDIR     	 = $(ROOTDIR)/config/scripts
+LINUX_CONFIG   	 = $(ROOTDIR)/$(LINUXDIR)/.config
+ARCH_CONFIG    	 = $(ROOTDIR)/vendors/config/mips/config.arch
+PROJECT_CONFIG 	 = $(ROOTDIR)/.config
+SSTRIP_TOOL    	 = $(if $(CONFIG_FIRMWARE_PERFORM_SSTRIP),$(ROOTDIR)/tools/sstrip/sstrip)
+EXTERNAL_SOURCES = $(ROOTDIR)/externals.mk
 
 FIRMWARE_MAXSIZE = $(shell awk '/"Firmware"/{ getline; getline; gsub(/,$$/,""); print strtonum($$2); }' $(BOARDDIR)/partitions.config)
 
 #NUM MAKE PROCESS = CPU NUMBER IN THE SYSTEM * CPU_OVERLOAD
-CPU_OVERLOAD	= 1
-HOST_NCPU	= $(shell if [ -f /proc/cpuinfo ]; then n=`getconf _NPROCESSORS_ONLN 2>/dev/null || echo 0`; if [ $$n -gt 1 ];then expr $$n \* ${CPU_OVERLOAD}; else echo $$n; fi; else echo 1; fi)
+CPU_OVERLOAD	 = 1
+HOST_NCPU		 = $(shell if [ -f /proc/cpuinfo ]; then n=`getconf _NPROCESSORS_ONLN 2>/dev/null || echo 0`; if [ $$n -gt 1 ];then expr $$n \* ${CPU_OVERLOAD}; else echo $$n; fi; else echo 1; fi)
 
-CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
-	  else if [ -x /bin/bash ]; then echo /bin/bash; \
-	  else echo sh; fi ; fi)
+CONFIG_SHELL 	 := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+	  				else if [ -x /bin/bash ]; then echo /bin/bash; \
+	  				else echo sh; fi ; fi)
 
 FIRMWARE_KERNEL_VER="3.4"
 CONFIG_CROSS_COMPILER_ROOT = $(ROOTDIR)/../toolchain/out
