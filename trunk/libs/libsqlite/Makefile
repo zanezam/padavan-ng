@@ -1,7 +1,12 @@
-SRC_NAME=sqlite-32XXXXX
+PKG_VERSION=autoconf-3300100
+SRC_NAME=sqlite-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.gz
+SRC_URL=https://www.sqlite.org/2019/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -12,8 +17,6 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; \
-	aclocal ; \
-	autoconf ; \
 	./configure \
 		--prefix=$(STAGEDIR) \
 		$(if $(LIBS_BUILD_SHARED),--disable-static,--enable-static) \
@@ -26,14 +29,16 @@ configure:
 		--disable-fts5 \
 		--disable-json1 \
 		--disable-rtree \
+		--disable-session \
+		--disable-debug \
+		--disable-static-shell \
 		--host=$(HOST_TARGET) \
 		--build=$(HOST_BUILD) ; \
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:

@@ -1,7 +1,12 @@
-SRC_NAME=libusb-1.0.X
+PKG_VERSION=1.0.23
+SRC_NAME=libusb-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.bz2
+SRC_URL=https://github.com/libusb/libusb/releases/download/v$(PKG_VERSION)/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -15,6 +20,7 @@ configure:
 	ac_cv_lib_rt_clock_gettime=no \
 	./configure \
 		--prefix=$(STAGEDIR) \
+		--enable-shared \
 		--disable-static \
 		--disable-log \
 		--disable-udev \
@@ -26,9 +32,8 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:
@@ -36,4 +41,3 @@ install:
 
 romfs:
 	cp -fP $(DESTDIR)/lib/libusb-1.0.so* $(ROMFSDIR)/lib
-

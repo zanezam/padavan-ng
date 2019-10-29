@@ -1,4 +1,7 @@
-SRC_NAME=libnfnetlink-1.0.x
+PKG_VERSION=1.0.1
+SRC_NAME=libnfnetlink-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.bz2
+SRC_URL=https://www.netfilter.org/projects/libnfnetlink/files/$(SRC_ARCHIVE)
 
 all: config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
@@ -21,13 +24,11 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
-	rm -f config_done
+    rm -rf $(SRC_NAME)
+	rm -f patching_done
+    rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
-

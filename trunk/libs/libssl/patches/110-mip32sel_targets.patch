@@ -1,0 +1,26 @@
+Subject: Add mips32el targets
+
+Targets are named: linux-$(CONFIG_ARCH)-mips32el
+
+--- /dev/null
++++ b/Configurations/25-mips32el.conf
+@@ -0,0 +1,19 @@
++## Mips32el "CONFIG_ARCH" matching targets.
++
++# The targets need to end in '-mips32el'
++
++my %targets = (
++    "mips32el" => {
++       template    => 1,
++    },
++### Basic default option
++    "linux-mips32el" => {
++        # Configure script adds minimally required -march for assembly
++        # support, if no -march was specified at command line.
++        inherit_from     => [ "linux-generic32", asm("mips32_asm") ],
++        lib_cppflags     => add("-DL_ENDIAN"),
++        cppflags         => add(threads("-D_REENTRANT")),
++        bn_ops           => "BN_LLONG RC4_CHAR RC4_CHUNK DES_INT DES_UNROLL",
++        perlasm_scheme   => "o32",
++    },
++);

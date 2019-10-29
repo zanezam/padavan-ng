@@ -1,7 +1,12 @@
-SRC_NAME=libsodium-1.0.XX
+PKG_VERSION=1.0.18
+SRC_NAME=libsodium-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.gz
+SRC_URL=https://github.com/jedisct1/libsodium/releases/download/$(PKG_VERSION)-RELEASE/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -14,8 +19,6 @@ configure:
 	( cd $(SRC_NAME) ; \
 	./configure \
 		--prefix=$(STAGEDIR) \
-		--disable-shared \
-		--enable-static \
 		--disable-ssp \
 		--enable-minimal \
 		--host=$(HOST_TARGET) \
@@ -23,12 +26,12 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
+	cp -fP $(DESTDIR)/lib/libsodium.so* $(ROMFSDIR)/lib

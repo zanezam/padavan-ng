@@ -1,7 +1,12 @@
-SRC_NAME=libevent-2.1.X
+PKG_VERSION=2.1.11-stable
+SRC_NAME=libevent-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.gz
+SRC_URL=https://github.com/libevent/libevent/releases/download/release-$(PKG_VERSION)/$(SRC_ARCHIVE)
 
-all: config_test
-	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+all: prepare_sources config_test
+	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)/build
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -11,27 +16,28 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
-	./configure \
-		--prefix=$(STAGEDIR) \
-		--disable-static \
-		--enable-shared \
-		--disable-debug-mode \
-		--disable-openssl \
-		--disable-samples \
-		--host=$(HOST_TARGET) \
-		--build=$(HOST_BUILD) ; \
+	( mkdir -p $(SRC_NAME)/build && cd $(SRC_NAME)/build ; \
+	cmake \
+	-DCMAKE_INSTALL_PREFIX=$(STAGEDIR) \
+	-DCMAKE_TOOLCHAIN_FILE=../../cross-mipsel-linux.cmake \
+	-DEVENT__DISABLE_BENCHMARK:BOOL=ON \
+	-DEVENT__DISABLE_DEBUG_MODE:BOOL=ON \
+	-DEVENT__DISABLE_REGRESS:BOOL=ON \
+	-DEVENT__DISABLE_SAMPLES:BOOL=ON \
+	-DEVENT__DISABLE_OPENSSL:BOOL=OFF \
+	-DEVENT__DISABLE_THREAD_SUPPORT:BOOL=OFF \
+	-DEVENT__DISABLE_TESTS:BOOL=ON \
+	-DBUILD_TESTING:BOOL=OFF
+	.. \
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
-	rm -f config_done
+    rm -rf $(SRC_NAME)
+	rm -f patching_done
+    rm -f config_done
 
 install:
-	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
+	$(MAKE) -C $(SRC_NAME)/build install DESTDIR=""
 
 romfs:
 	cp -fP $(DESTDIR)/lib/libevent-2.1.so* $(ROMFSDIR)/lib
-

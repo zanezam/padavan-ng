@@ -1,7 +1,12 @@
-SRC_NAME=libtirpc-1.0.X
+PKG_VERSION=1.1.4
+SRC_NAME=libtirpc-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.bz2
+SRC_URL=https://downloads.sourceforge.net/libtirpc/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_surces config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -23,9 +28,8 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:

@@ -1,4 +1,7 @@
-SRC_NAME=openssl-1.1.1
+PKG_VERSION=1.1.1d
+SRC_NAME=openssl-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.gz
+SRC_URL=https://www.openssl.org/source/$(SRC_ARCHIVE)
 
 # openssl use CROSS_COMPILE prefix
 CC=gcc $(CPUFLAGS)
@@ -23,14 +26,10 @@ ifneq ($(CONFIG_FIRMWARE_INCLUDE_TOR),y)
 OPENSSL_OPTIONS += no-threads
 endif
 
-#ifdef CONFIG_CRYPTO_DEV_LINUX
-#OPENSSL_OPTIONS += enable-devcryptoeng
-#else
 OPENSSL_OPTIONS += no-hw no-devcryptoeng
 ifneq ($(CONFIG_FIRMWARE_INCLUDE_TOR),y)
 OPENSSL_OPTIONS += no-engine
 endif
-#endif
 
 ifneq ($(CONFIG_FIRMWARE_INCLUDE_SSWAN),y)
 OPENSSL_OPTIONS += no-rc2
@@ -40,8 +39,10 @@ ifeq (,$(filter y,$(CONFIG_FIRMWARE_INCLUDE_OPENSSL_EC) $(CONFIG_FIRMWARE_INCLUD
 OPENSSL_OPTIONS += no-ec
 endif
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -63,7 +64,8 @@ configure:
 	)
 
 clean:
-	$(MAKE) -C $(SRC_NAME) distclean
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:

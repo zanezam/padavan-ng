@@ -1,7 +1,12 @@
-SRC_NAME=libexif-0.6.21
+PKG_VERSION=0.6.21
+SRC_NAME=libexif-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.bz2
+SRC_URL=https://sourceforge.net/projects/libexif/files/libexif/$(PKG_VERSION/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -23,13 +28,11 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
-	rm -f config_done
+    rm -rf $(SRC_NAME)
+	rm -f patching_done
+    rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
-

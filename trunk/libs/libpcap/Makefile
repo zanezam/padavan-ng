@@ -1,7 +1,12 @@
-SRC_NAME=libpcap-1.X.X
+PKG_VERSION=1.9.1
+SRC_NAME=libpcap-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.gz
+SRC_URL=https://www.tcpdump.org/release/$(SRC_ARCHIVE)
 
-all: config_test
-	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+all: prepare_sources config_test
+	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)/build
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -11,36 +16,32 @@ config_test:
 	fi )
 
 configure:
-	( cd $(SRC_NAME) ; \
-	ac_cv_netfilter_can_compile=no \
-	./configure \
-		--prefix=$(STAGEDIR) \
-		--disable-shared \
-		$(if $(CONFIG_IPV6),--enable-ipv6,--disable-ipv6) \
-		--disable-yydebug \
-		--disable-usb \
-		--disable-dbus \
-		--disable-bluetooth \
-		--disable-netmap \
-		--disable-rdma \
-		--with-pcap=linux \
-		--without-dag \
-		--without-septel \
-		--without-libnl \
-		--without-snf \
-		--host=$(HOST_TARGET) \
-		--build=$(HOST_BUILD) ; \
+	( mkdir -p $(SRC_NAME)/build && cd $(SRC_NAME)/build ; \
+	cmake \
+	-DCMAKE_INSTALL_PREFIX=$(STAGEDIR) \
+	-DCMAKE_TOOLCHAIN_FILE=../../cross-mipsel-linux.cmake \
+	-DBUILD_SHARED_LIBS=ON \
+	-DBUILD_WITH_LIBNL=OFF \
+	-DDISABLE_DAG=ON \
+	-DDISABLE_DBUS=ON \
+	-DDISABLE_NETMAP=ON \
+	-DDISABLE_RDMA=ON \
+	-DDISABLE_SEPTEL=ON \
+	-DDISABLE_SNF=ON \
+	-DDISABLE_TC=ON \
+	-DBDEBUG=OFF \
+	-DYYDEBUG=OFF \
+	-DPCAP_SUPPORT_NETFILTER=OFF \
+	.. \
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
+	rm -rf $(SRC_NAME)
+	rm -f patching_done
 	rm -f config_done
 
 install:
-	$(MAKE) -C $(SRC_NAME) install DESTDIR="" ;
-	rm -f $(DESTDIR)/lib/libpcap.so* ;
+	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
-
+	cp -fP $(DESTDIR)/lib/libpcap.so.* $(ROMFSDIR)/lib/

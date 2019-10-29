@@ -1,9 +1,14 @@
-SRC_NAME=confuse-3.2.2
+PKG_VERSION=3.2.2
+SRC_NAME=confuse-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.xz
+SRC_URL=https://github.com/martinh/libconfuse/releases/download/v$(PKG_VERSION)/$(SRC_ARCHIVE)
 
 CFLAGS += -Os
 
-all: config_test
-	$(MAKE) -C $(SRC_NAME)
+all: prepare_sources config_test
+	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -23,13 +28,11 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
-	rm -f config_done
+        rm -rf $(SRC_NAME)
+		rm -f patching_done
+        rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR="" ;
 
 romfs:
-

@@ -27,7 +27,15 @@ LIBS_INCLUDE_LIBSSL=n
 LIBS_INCLUDE_LIBUSB_0=n
 LIBS_INCLUDE_LIBUSB_1=n
 LIBS_INCLUDE_LIBEVENT=n
+LIBS_INCLUDE_LIBPCAP=n
+LIBS_INCLUDE_LIBWEBSOCKETS=n
 LIBS_INCLUDE_MEDIA=n
+LIBS_INCLUDE_CURL=n
+LIBS_INCLUDE_NCURSES=n
+LIBS_INCLUDE_LIBPCRE=n
+LIBS_INCLUDE_LIBSODIUM=n
+LIBS_INCLUDE_LIBXML2=n
+LIBS_INCLUDE_MBEDTLS=n
 STORAGE_ENABLED=n
 
 ifdef CONFIG_MMC_BLOCK
@@ -72,7 +80,7 @@ endif
 ifeq ($(STORAGE_ENABLED),y)
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_TRANSMISSION),y)
 LIBS_INCLUDE_LIBSSL=y
-LIBS_INCLUDE_LIBEVENT=y
+LIBS_INCLUDE_CURL=y
 endif
 ifeq ($(CONFIG_FIRMWARE_INCLUDE_ARIA),y)
 LIBS_INCLUDE_LIBSSL=y
@@ -102,14 +110,27 @@ LIBS_INCLUDE_LIBSSL=y
 LIBS_INCLUDE_LIBEVENT=y
 endif
 
-dir_y						+= libz
-dir_$(LIBS_INCLUDE_LIBLZO)			+= liblzo
-dir_$(LIBS_INCLUDE_LIBSSL)			+= libssl
-dir_$(LIBS_INCLUDE_LIBUSB_0)			+= libusb
-dir_$(LIBS_INCLUDE_LIBUSB_1)			+= libusb-1.0
-dir_$(LIBS_INCLUDE_LIBEVENT)			+= libevent
-dir_y						+= libnfnetlink
-dir_y						+= libconfuse
+dir_y										+= libz
+dir_$(LIBS_INCLUDE_NCURSES)					+= libncurses
+dir_$(LIBS_INCLUDE_LIBLZO)					+= liblzo
+dir_$(LIBS_INCLUDE_LIBSSL)					+= libssl
+dir_$(LIBS_INCLUDE_LIBUSB_0)				+= libusb
+dir_$(LIBS_INCLUDE_LIBUSB_1)				+= libusb-1.0
+dir_$(LIBS_INCLUDE_LIBEVENT)				+= libevent
+dir_$(LIBS_INCLUDE_LIBPCRE)					+= libpcre
+dir_$(LIBS_INCLUDE_LIBEV)					+= libev
+dir_$(LIBS_INCLUDE_LIBSODIUM)				+= libsodium
+dir_y										+= libnfnetlink
+dir_y										+= libconfuse
+
+ifeq ($(CONFIG_FIRMWARE_INCLUDE_CURL))
+LIBS_INCLUDE_CURL=y
+LIBS_INCLUDE_MBEDTLS=y
+endif
+
+dir_$(CONFIG_FIRMWARE_INCLUDE_HTOP)			+= libncurses
+
+dir_$(CONFIG_FIRMWARE_INCLUDE_NANO)			+= libncurses
 
 # ipset shared libs
 dir_$(CONFIG_FIRMWARE_INCLUDE_IPSET)		+= libmnl
@@ -118,30 +139,30 @@ dir_$(CONFIG_FIRMWARE_INCLUDE_IPSET)		+= libmnl
 dir_$(CONFIG_FIRMWARE_INCLUDE_TCPDUMP)		+= libpcap
 
 # minidlna and firefly shared libs
-dir_$(LIBS_INCLUDE_MEDIA)			+= libid3tag
-dir_$(LIBS_INCLUDE_MEDIA)			+= libav
+dir_$(LIBS_INCLUDE_MEDIA)					+= libid3tag
+dir_$(LIBS_INCLUDE_MEDIA)					+= libav
 dir_$(CONFIG_FIRMWARE_INCLUDE_MINIDLNA)		+= libexif
 dir_$(CONFIG_FIRMWARE_INCLUDE_MINIDLNA)		+= libjpeg
 dir_$(CONFIG_FIRMWARE_INCLUDE_MINIDLNA)		+= libogg
 dir_$(CONFIG_FIRMWARE_INCLUDE_MINIDLNA)		+= libvorbis
-dir_$(LIBS_INCLUDE_MEDIA)			+= libflac
-dir_$(LIBS_INCLUDE_MEDIA)			+= libsqlite
+dir_$(LIBS_INCLUDE_MEDIA)					+= libflac
+dir_$(LIBS_INCLUDE_MEDIA)					+= libsqlite
 
 # transmission shared libs
-dir_$(CONFIG_FIRMWARE_INCLUDE_TRANSMISSION)	+= libcurl
+dir_$(CONFIG_FIRMWARE_INCLUDE_TRANSMISSION)		+= libcurl
 
 # aria2 shared libs
-dir_$(CONFIG_FIRMWARE_INCLUDE_ARIA)		+= libxml2
+dir_$(CONFIG_FIRMWARE_INCLUDE_ARIA)				+= libxml2
 
 # privoxy shared libs
-dir_$(CONFIG_FIRMWARE_INCLUDE_PRIVOXY)		+= libpcre
+dir_$(CONFIG_FIRMWARE_INCLUDE_PRIVOXY)			+= libpcre
 
 # dnscrypt extra libs
-dir_$(CONFIG_FIRMWARE_INCLUDE_DNSCRYPT)		+= libsodium
+dir_$(CONFIG_FIRMWARE_INCLUDE_DNSCRYPT)			+= libsodium
 
 # nfs rpc lib
 ifneq (,$(filter y,$(CONFIG_FIRMWARE_INCLUDE_NFSD) $(CONFIG_FIRMWARE_INCLUDE_NFSC)))
-dir_y						+= libtirpc
+dir_y += libtirpc
 endif
 
 all:

@@ -1,7 +1,12 @@
-SRC_NAME=libogg-1.3.3
+PKG_VERSION=1.3.4
+SRC_NAME=libogg-$(PKG_VERSION)
+SRC_ARCHIVE=$(SRC_NAME).tar.xz
+SRC_URL=http://downloads.xiph.org/releases/ogg/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -21,13 +26,11 @@ configure:
 	)
 
 clean:
-	if [ -f $(SRC_NAME)/Makefile ] ; then \
-		$(MAKE) -C $(SRC_NAME) distclean ; \
-	fi ; \
-	rm -f config_done
+    rm -rf $(SRC_NAME)
+	rm -f patching_done
+    rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
 
 romfs:
-
