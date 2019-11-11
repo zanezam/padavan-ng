@@ -3,8 +3,10 @@ SRC_NAME=libnfnetlink-$(PKG_VERSION)
 SRC_ARCHIVE=$(SRC_NAME).tar.bz2
 SRC_URL=https://www.netfilter.org/projects/libnfnetlink/files/$(SRC_ARCHIVE)
 
-all: config_test
+all: prepare_sources config_test
 	$(MAKE) -j$(HOST_NCPU) -C $(SRC_NAME)
+
+include $(EXTERNAL_SOURCES)
 
 config_test:
 	( if [ -f ./config_done ]; then \
@@ -24,9 +26,9 @@ configure:
 	)
 
 clean:
-    rm -rf $(SRC_NAME)
+	rm -rf $(SRC_NAME)
 	rm -f patching_done
-    rm -f config_done
+	rm -f config_done
 
 install:
 	$(MAKE) -C $(SRC_NAME) install DESTDIR=""
