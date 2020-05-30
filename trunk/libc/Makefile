@@ -29,7 +29,7 @@ ifneq (,$(filter y,$(CONFIG_MMC_BLOCK) $(CONFIG_BLK_DEV_SD)))
 else
 	$(call KconfigDisableOption,UCLIBC_HAS_LIBICONV,$(LIBC_DIR)/.config)
 endif
-	$(call KconfigSetOption,UCLIBC_EXTRA_CFLAGS,"$(CPUFLAGS)$(CFLAGS)",$(LIBC_DIR)/.config)
+	$(call KconfigSetOption,UCLIBC_EXTRA_CFLAGS,"$(CPUFLAGS) $(CFLAGS)",$(LIBC_DIR)/.config)
 	$(MAKE) -j$(HOST_NCPU) -C $(LIBC_DIR) oldconfig || exit $$? ; \
 	if [ ! -f $(DESTDIR)/.installed_$(LIBC_DIR) ] ; then \
 		$(MAKE) -C $(LIBC_DIR) PREFIX=$(DESTDIR) DEVEL_PREFIX=/ MULTILIB_DIR=lib install_runtime install_utils && \
