@@ -36,7 +36,6 @@
    exposed on purpose.  */
 typedef unsigned long int pthread_t;
 
-
 union pthread_attr_t
 {
   char __size[__SIZEOF_PTHREAD_ATTR_T];
@@ -44,7 +43,7 @@ union pthread_attr_t
 };
 #ifndef __have_pthread_attr_t
 typedef union pthread_attr_t pthread_attr_t;
-# define __have_pthread_attr_t1
+# define __have_pthread_attr_t	1
 #endif
 
 typedef struct __pthread_internal_list
@@ -74,9 +73,6 @@ typedef union
   char __size[__SIZEOF_PTHREAD_MUTEX_T];
   long int __align;
 } pthread_mutex_t;
-
-/* Mutex __spins initializer used by PTHREAD_MUTEX_INITIALIZER.  */
-#define __PTHREAD_SPINS 0
 
 typedef union
 {
@@ -140,8 +136,6 @@ typedef union
   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
   long int __align;
 } pthread_rwlock_t;
-
-#define __PTHREAD_RWLOCK_ELISION_EXTRA 0
 
 typedef union
 {

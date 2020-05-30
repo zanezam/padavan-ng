@@ -45,6 +45,9 @@
 	.globl	_start
 	.type	_start,%function
 
+	.weak _init
+	.weak _fini
+
 _start:
 	call  .Lload_gp
 	mv    a5, a0  /* rtld_fini.  */
@@ -53,6 +56,8 @@ _start:
 	REG_L a1, 0(sp)      /* argc.  */
 	addi  a2, sp, SZREG  /* argv.  */
 	andi  sp, sp, ALMASK /* Align stack. */
+	lla   a3, _init
+	lla   a4, _fini
 	mv    a6, sp  /* stack_end.  */
 
 	tail  __uClibc_main@plt

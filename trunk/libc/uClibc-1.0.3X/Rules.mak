@@ -128,7 +128,7 @@ export RUNTIME_PREFIX DEVEL_PREFIX KERNEL_HEADERS MULTILIB_DIR
 # Now config hard core
 MAJOR_VERSION := 1
 MINOR_VERSION := 0
-SUBLEVEL      := 31
+SUBLEVEL      := 34
 EXTRAVERSION  :=
 VERSION       := $(MAJOR_VERSION).$(MINOR_VERSION).$(SUBLEVEL)
 ABI_VERSION   := $(MAJOR_VERSION)
@@ -189,11 +189,13 @@ endif
 
 # A nifty macro to make testing gcc features easier
 check_gcc=$(shell \
-	if $(CC) $(1) -S -o /dev/null -xc /dev/null > /dev/null 2>&1; \
-	then echo "$(1)"; else echo "$(2)"; fi)
+	tf="/tmp/cgccucl$$$$.o"; \
+	if $(CC) $(1) -S -o $$tf -xc /dev/null > /dev/null 2>&1; \
+	then echo "$(1)"; else echo "$(2)"; fi; rm -f $$tf )
 check_as=$(shell \
-	if $(CC) -Wa,$(1) -Wa,-Z -c -o /dev/null -xassembler /dev/null > /dev/null 2>&1; \
-	then echo "-Wa,$(1)"; fi)
+	tf="/tmp/casucl$$$$.o"; \
+	if $(CC) -Wa,$(1) -Wa,-Z -c -o $$tf -xassembler /dev/null > /dev/null 2>&1; \
+	then echo "-Wa,$(1)"; fi; rm -f $$tf )
 check_ld=$(shell \
 	tf="/tmp/clducl$$$$.c"; echo "int _start(){return 0;}int main(){return 0;}" >$$tf; \
 	if $(CC) $(LDFLAG-fuse-ld) $(CFLAG_-Wl--no-warn-mismatch) -Wl,$(1) $(CFLAG_-nostdlib) -o /dev/null $$tf > /dev/null 2>&1; \
