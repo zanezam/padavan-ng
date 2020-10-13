@@ -1,4 +1,4 @@
-SRC_NAME=util-linux-2.34
+kSRC_NAME=util-linux-2.34
 
 THISDIR = $(shell pwd)
 
@@ -20,6 +20,7 @@ config_test:
 
 configure:
 	( cd $(SRC_NAME) ; \
+	autoreconf -f -i ; \
 	PKG_CONFIG_PATH=$(STAGEDIR)/lib/pkgconfig \
 	scanf_cv_type_modifier=no \
 	./configure \
